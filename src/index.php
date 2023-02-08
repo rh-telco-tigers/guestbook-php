@@ -1,7 +1,7 @@
 <?php
 require_once 'service/storage.php';
 
-$db = new Database('./');
+$db = new Database();
 $records = $db->get_entries();
 ?>
 <!doctype html>

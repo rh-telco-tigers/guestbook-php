@@ -1,4 +1,5 @@
 <?php
+session_save_path('/tmp/sessions');
 session_start();
 
 if(!isset($_SESSION['logged'])) {
@@ -10,7 +11,7 @@ require_once '../service/storage.php';
 
 
 $message = '';
-$db = new Database('../');
+$db = new Database();
 
 
 if(filter_has_var(INPUT_POST, 'target')){

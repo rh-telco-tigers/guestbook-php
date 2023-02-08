@@ -1,6 +1,7 @@
 <?php
 require_once './../service/storage.php';
 
+session_save_path('/tmp/sessions');
 session_start();
 
 define('LOG_IP', 0);
@@ -10,7 +11,7 @@ define('LOG_SUCCESS', 2);
 $reply = '';
 $reload = false;
 
-$db = new Database('../');
+$db = new Database();
 
 if (!isset($_SESSION['logged']) && filter_has_var(INPUT_POST, 'login')) {
     $user_name = filter_input(INPUT_POST, 'login', FILTER_SANITIZE_SPECIAL_CHARS);

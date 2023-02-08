@@ -1,4 +1,6 @@
 <?php
+require_once(__DIR__.'/../config/database-config.php');
+
 date_default_timezone_set("Europe/London");  # TODO allow to set in settings panel
 
 $EMOTICONS = array(
@@ -21,7 +23,6 @@ $EMOTICONS = array(
 );
 
 class Database {
-    const PAHT = 'db.sqlite';
     const NOT_APPROVED = 1;
     const APPROVED = 2;
     const BIN = 3;
@@ -29,47 +30,54 @@ class Database {
     private $pdo = null;
     private $location = '';
     
-    public function __construct($prefix='../') {
-        $this->location = $prefix . $this::PAHT;
-        $initialized = file_exists($this->location);
-        $this->pdo = new PDO('sqlite:' . $this->location);
+    public function __construct() {
+
+        global $dsn, $user, $password;
+
+        $this->pdo = new PDO($dsn, $user, $password);
+        $this->pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
         
-        if(!$initialized) {
+        $request = $this->pdo->prepare("SELECT 1 FROM FailedLogins LIMIT 1");
+        try {
+            $request->execute();
+        } catch (Exception $e) {
+            // We got an exception (table not found)
             $this->init_db();
         }
-    }
     
+    }
+
     private function init_db() {
         $this->pdo->exec("
             CREATE TABLE Users (
-                ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, 
-                UserName TEXT NOT NULL UNIQUE, 
-                Password TEXT NOT NULL,
+                ID INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT, 
+                UserName varchar(255) NOT NULL UNIQUE, 
+                Password varchar(255) NOT NULL,
                 LastValidLoginTime INTEGER NOT NULL,
                 LastFailedLoginTime INTEGER
             );");
         
         $this->pdo->exec("
             INSERT INTO Users
-            VALUES (NULL, 'admin', '" . sha1('admin') . "', strftime('%s', 'now'), NULL);
-            ");
+            VALUES (NULL, 'admin', sha1('admin'), UNIX_TIMESTAMP(now()), NULL
+            );");
 
         $this->pdo->exec("
             CREATE TABLE Entries (
-                ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-                IP TEXT,
+                ID INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                IP varchar(255),
                 Kind INTEGER NOT NULL,
-                Name TEXT NOT NULL,
-                Email TEXT,
-                Message TEXT,
+                Name varchar(255) NOT NULL,
+                Email varchar(255),
+                Message varchar(255),
                 CreationTime INTEGER  NOT NULL,
                 ModificationTime INTEGER  NOT NULL
             );");
         
         $this->pdo->exec("
             CREATE TABLE FailedLogins (
-                ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-                IP TEXT UNIQUE,
+                ID INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                IP varchar(255) UNIQUE,
                 FailCount INTEGER,
                 LastTryTime INTEGER
             );");
@@ -134,7 +142,7 @@ class Database {
         
         $request = $this->pdo->prepare("
             UPDATE Users 
-            SET LastValidLoginTime=strftime('%s', 'now')
+            SET LastValidLoginTime=UNIX_TIMESTAMP(now())
             WHERE UserName=:user;
             ");
         $request->bindParam(':user', $user_name);
@@ -146,7 +154,7 @@ class Database {
 
         $request = $this->pdo->prepare("
             UPDATE Users 
-            SET LastFailedLoginTime=strftime('%s', 'now')
+            SET LastFailedLoginTime=UNIX_TIMESTAMP(now())
             WHERE UserName=:user;
             ");
         $request->bindParam(':user', $user_name);
@@ -164,14 +172,14 @@ class Database {
         if(empty($fail_count)) {
             $request = $this->pdo->prepare("
                 INSERT INTO FailedLogins 
-                VALUES (NULL, :ip, 1, strftime('%s', 'now'));
+                VALUES (NULL, :ip, 1, UNIX_TIMESTAMP(now()));
                 ");
             $request->bindParam(':ip', $ip);
             $request->execute();
         } else {
             $request = $this->pdo->prepare("
                 UPDATE FailedLogins 
-                SET FailCount=:fail_count, LastTryTime=strftime('%s', 'now')
+                SET FailCount=:fail_count, LastTryTime=UNIX_TIMESTAMP(now())
                 WHERE IP=:ip;
                 ");
             $request->bindValue(':fail_count', $fail_count + 1, PDO::PARAM_INT);
@@ -181,9 +189,10 @@ class Database {
     }
     
     public function create_new_entry($name, $email, $message) {
+        $this->pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING );
         $request = $this->pdo->prepare("
             INSERT INTO Entries
-            VALUES (NULL, :ip, :kind, :name, :email, :message, strftime('%s', 'now'), strftime('%s', 'now'));
+            VALUES (NULL, :ip, :kind, :name, :email, :message, UNIX_TIMESTAMP(now()), UNIX_TIMESTAMP(now()));
             ");
         $request->bindValue(':kind', $this::NOT_APPROVED, PDO::PARAM_INT);
         $request->bindValue(':ip', $this->get_ip());
@@ -210,7 +219,7 @@ class Database {
         $ids_str = '(' . join(', ', $ids) . ')';
         $request = $this->pdo->prepare("
             UPDATE Entries 
-            SET Kind=:kind, ModificationTime=strftime('%s', 'now')
+            SET Kind=:kind, ModificationTime=UNIX_TIMESTAMP(now())
             WHERE ID IN $ids_str;
             ");
         $request->bindParam(':kind', $target, PDO::PARAM_INT);

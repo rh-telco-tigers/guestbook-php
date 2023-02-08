@@ -1,0 +1,31 @@
+FROM ubi8/ubi
+
+RUN yum -y install --disableplugin=subscription-manager \
+  httpd php php-pdo php-mysqlnd \
+  && yum --disableplugin=subscription-manager clean all
+
+
+ADD src /var/www/html
+
+RUN sed -i 's/Listen 80/Listen 8080/' /etc/httpd/conf/httpd.conf \
+  && sed -i 's/listen.acl_users = apache,nginx/listen.acl_users =/' /etc/php-fpm.d/www.conf \
+  && mkdir /run/php-fpm \
+  && chgrp -R 0 /var/log/httpd /var/run/httpd /run/php-fpm \
+  && chmod -R g=u /var/log/httpd /var/run/httpd /run/php-fpm
+
+ADD envars.conf /etc/php-fpm.d
+ADD docker.conf /etc/php-fpm.d
+
+RUN mkdir /tmp/sessions
+RUN chgrp -R 0 /tmp/sessions && \
+   chmod -R g=u /tmp/sessions
+
+
+ENV REMOTE_DSN='mysql:dbname=guestbook;host=127.0.0.1'
+ENV REMOTE_DB_USER='username'
+ENV REMOTE_DB_PASS='password'
+
+EXPOSE 8080
+USER 1001
+
+CMD php-fpm & httpd -D FOREGROUND
