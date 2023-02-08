@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: guestbook-config
+data:
+  database-config.php: |-
+    <?php
+        # Get database settings from environment variables
+        $dsn = "sqlsrv:server=mssql-service, 1433\SQLEXPRESS;database=guestbook;Encrypt=Optional;";
+        $user = "SA";
+        $password = "GuestBookpass1!";
+    ?>

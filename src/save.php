@@ -39,11 +39,11 @@ $message = str_replace(
 
 if (!empty($name) & !empty($message)) {
     try {
-        $db = new Database('./');
+        $db = new Database();
         $db->create_new_entry($name, $email, $message);
 
         $reply = format_reply(
-            'success', 'Thank you very much.<br />Entry is waiting for administrator approvement.'
+            'success', 'Thank you very much.<br />The entry is waiting for administrator approval.'
         );
     } catch (Exception $exc) {
         $reply = format_reply(

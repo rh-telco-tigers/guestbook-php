@@ -1,6 +1,7 @@
 <?php
 require_once './../service/storage.php';
 
+# session_save_path('/tmp/sessions');
 session_start();
 
 define('LOG_IP', 0);
@@ -10,11 +11,11 @@ define('LOG_SUCCESS', 2);
 $reply = '';
 $reload = false;
 
-$db = new Database('../');
+$db = new Database();
 
 if (!isset($_SESSION['logged']) && filter_has_var(INPUT_POST, 'login')) {
     $user_name = filter_input(INPUT_POST, 'login', FILTER_SANITIZE_SPECIAL_CHARS);
-    $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_STRING);
+    $password = filter_input(INPUT_POST, 'password', FILTER_UNSAFE_RAW);
 
     $login_try_time = $db->get_next_login_try_time();
 
@@ -34,7 +35,7 @@ if (!isset($_SESSION['logged']) && filter_has_var(INPUT_POST, 'login')) {
     }
 }
 
-if (isset($_SESSION['logged']) && filter_input(INPUT_GET, 'action', FILTER_SANITIZE_STRING) == 'logout') {
+if (isset($_SESSION['logged']) && filter_input(INPUT_GET, 'action', FILTER_UNSAFE_RAW) == 'logout') {
     unset($_SESSION['logeed']);
     setcookie('is_logged', null, 0, '/');
     session_destroy();
