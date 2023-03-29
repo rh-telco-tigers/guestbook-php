@@ -118,3 +118,12 @@ Then go to settings and change user name and password.
 ### Entry review site
 
 ![Review site image](docs/image_4.png)
+
+
+## References
+
+* [Installing PHP Driver for SQL Server](https://learn.microsoft.com/en-us/sql/connect/php/installation-tutorial-linux-mac?view=sql-server-ver16#installing-on-red-hat)
+* [Installing SQL Server ODBC Driver in Linux](https://learn.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server?view=sql-server-ver16&tabs=alpine18-install%2Calpine17-install%2Cdebian8-install%2Credhat7-13-install%2Crhel7-offline)
+* [Deploying SQL Server in OpenShift](https://learn.microsoft.com/en-us/sql/big-data-cluster/deploy-openshift?view=sql-server-ver15)
+* [Lab - Deploying SQL Server in OpenShift](https://github.com/microsoft/sqlworkshops-sqlonopenshift/blob/master/sqlonopenshift/01_Deploy.md)
+* [Lab - Restoring Database in SQL Server](https://github.com/microsoft/sqlworkshops-sqlonopenshift/blob/master/sqlonopenshift/02_query/step3_restore_backup.sh)
