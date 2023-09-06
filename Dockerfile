@@ -12,7 +12,7 @@ COPY src /var/www/public
 RUN chown -R www-data:www-data /var/www
 
 RUN mkdir /tmp/sessions
-RUN chown -R www-data:www-data /tmp/sessions
+RUN chown -R www-data:0 /tmp/sessions
 RUN chgrp -R 0 /etc/apache2 && \
    chmod -R g=u /etc/apache2
 RUN chgrp -R 0 /var/log/apache2 && \
