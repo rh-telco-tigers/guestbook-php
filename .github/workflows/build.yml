@@ -9,6 +9,7 @@ env:
   GHCR_IMAGE_REGISTRY: ghcr.io
   GHCR_REGISTRY_USER: ${{ github.actor }}
   GHCR_REGISTRY_PASSWORD: ${{ github.token }}
+  GHCR_REPOSITORY: ${{ github.repository }} 
 
 jobs:
 
@@ -39,7 +40,7 @@ jobs:
       with:
         image: ${{ steps.build-image.outputs.image }}
         tags: ${{ steps.build-image.outputs.tags }}
-        registry: ${{ env.GHCR_IMAGE_REGISTRY }}/${{ env.GHCR_REGISTRY_USER }}
+        registry: ${{ env.GHCR_IMAGE_REGISTRY }}/${{ env.GHCR_REPOSITORY }}
 
     - name: Print image url
       run: echo "Image pushed to ${{ steps.push-to-ghcr.outputs.registry-paths }}"
