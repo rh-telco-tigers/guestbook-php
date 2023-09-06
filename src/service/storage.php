@@ -34,7 +34,8 @@ class Database {
 
         global $dsn, $user, $password;
 
-        $this->pdo = new PDO($dsn, $user, $password);
+        #$this->pdo = new PDO($dsn, $user, $password);
+        $this->pdo = new PDO($dsn);
         $this->pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
         
         $request = $this->pdo->prepare("SELECT 1 FROM FailedLogins LIMIT 1");
