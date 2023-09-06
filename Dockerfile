@@ -13,5 +13,8 @@ RUN chown -R www-data:www-data /var/www
 
 RUN mkdir /tmp/sessions
 RUN chown -R www-data:www-data /tmp/sessions
-
+RUN chgrp -R 0 /etc/apache2 && \
+   chmod -R g=u /etc/apache2
+RUN chgrp -R 0 /var/log/apache2 && \
+   chmod -R g=u /var/log/apache2
 CMD ["start-apache.sh"]
