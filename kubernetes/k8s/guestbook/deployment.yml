@@ -33,7 +33,7 @@ spec:
       containers:
         - name: guestbook
           image: >-
-            quay.io/markd/guestbook-php
+            ghcr.io/rh-telco-tigers/guestbook-php/guestbook-php:latest
           env:
             - name: REMOTE_DSN
               valueFrom:

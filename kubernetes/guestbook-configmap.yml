@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: guestbook-config
-  namespace: guestbookphp
-data:
-  dsn: "mysql:dbname=guestbook;host=mariadb"
